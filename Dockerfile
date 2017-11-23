@@ -1,4 +1,4 @@
-FROM ppodgorsek/httpd-custom-configuration:latest
+FROM ppodgorsek/httpd-custom-configuration:2.4.0
 
 MAINTAINER Paul Podgorsek <ppodgorsek@users.noreply.github.com>
 LABEL description httpd in Docker for SAP Hybris
