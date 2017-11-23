@@ -20,7 +20,24 @@ cat $CONF_FRAGMENTS_FOLDER/010-balancer-begin.conf > $HTTPD_CUSTOM_CONF_FOLDER/0
 for host in $hostsArray
 do
 	counter=$((counter+1))
-	echo "    BalancerMember \"${BACKEND_PROTOCOL}://${host}:${BACKEND_PORT}\" route=$counter" >> $HTTPD_CUSTOM_CONF_FOLDER/010-balancer.conf
+
+	if [ $host == 'localhost' ]
+	then
+		# localhost must be resolved in a special way to point to the host instead of the container itself
+
+		nameServers=`cat /etc/resolv.conf | grep nameserver`
+		numberOfNameServers=${#nameServers[@]} # Get the length.                                          
+		lastNameServerIndex=$((numberOfNameServers - 1)) # Subtract 1 from the length.                   
+		lastNameServer=${nameServers[${lastNameServerIndex}]} # Get the last position.
+		splitNameServer=(${lastNameServer// // })
+
+		resolvedHost=${splitNameServer[1]}
+		echo "Resolved IP for localhost: ${resolvedHost}"
+	else
+		resolvedHost=$host
+	fi;
+
+	echo "    BalancerMember \"${BACKEND_PROTOCOL}://${resolvedHost}:${BACKEND_PORT}\" route=$counter" >> $HTTPD_CUSTOM_CONF_FOLDER/010-balancer.conf
 done
 
 cat $CONF_FRAGMENTS_FOLDER/010-balancer-end.conf >> $HTTPD_CUSTOM_CONF_FOLDER/010-balancer.conf
