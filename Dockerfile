@@ -3,6 +3,8 @@ FROM ppodgorsek/httpd-custom-configuration:latest
 MAINTAINER Paul Podgorsek <ppodgorsek@users.noreply.github.com>
 LABEL description httpd in Docker for SAP Hybris
 
+EXPOSE 443
+
 ENV BACKEND_HOSTS localhost
 ENV BACKEND_PORT 8009
 ENV BACKEND_PROTOCOL ajp
