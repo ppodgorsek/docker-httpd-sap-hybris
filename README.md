@@ -53,3 +53,7 @@ A default self-signed certificate has been generated for `localhost`. You can us
 
 The certificate files is relative to the folder which has been mounted.
 
+## Please contribute!
+
+Have you found an issue? Do you have an idea for an improvement? Feel free to contribute by submitting it [on the GitHub project](https://github.com/ppodgorsek/docker-httpd-ssl-balancer/issues).
+
