@@ -5,4 +5,5 @@ services:
 
 script:
   - docker build -t docker-httpd-ssl-balancer .
+  - docker run --name docker-httpd-ssl-balancer docker-httpd-ssl-balancer && docker stop docker-httpd-ssl-balancer && docker rm docker-httpd-ssl-balancer
 
