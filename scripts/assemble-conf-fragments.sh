@@ -25,14 +25,17 @@ do
 	then
 		# localhost must be resolved in a special way to point to the host instead of the container itself
 
-		nameServers=`cat /etc/resolv.conf | grep nameserver`
-		numberOfNameServers=${#nameServers[@]} # Get the length.                                          
-		lastNameServerIndex=$((numberOfNameServers - 1)) # Subtract 1 from the length.                   
-		lastNameServer=${nameServers[${lastNameServerIndex}]} # Get the last position.
-		splitNameServer=(${lastNameServer// // })
-
-		resolvedHost=${splitNameServer[1]}
-		echo "Resolved IP for localhost: ${resolvedHost}"
+		if [[ $(ping -c1 docker.for.win.localhost) ]]
+		then
+			echo "Resolving 'localhost' as 'docker.for.win.localhost'";
+			resolvedHost="docker.for.win.localhost"
+		elif [[ $(ping -c1 docker.for.mac.localhost) ]]
+			echo "Resolving 'localhost' as 'docker.for.mac.localhost'";
+                        resolvedHost="docker.for.mac.localhost"
+		else
+			echo "Resolving 'localhost' as itself";
+			resolvedHost=$host
+		fi
 	else
 		resolvedHost=$host
 	fi;
