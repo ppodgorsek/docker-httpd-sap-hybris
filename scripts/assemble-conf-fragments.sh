@@ -1,5 +1,8 @@
 #!/bin/bash
 
+DOCKER_MAC_HOST="docker.for.mac.localhost"
+DOCKER_WINDOWS_HOST="docker.for.win.localhost"
+
 echo "Hybris backend hosts: ${BACKEND_HOSTS}"
 echo "Hybris backend port: ${BACKEND_PORT}"
 echo "Hybris backend protocol: ${BACKEND_PROTOCOL}"
@@ -24,19 +27,24 @@ do
 	if [ $host == 'localhost' ]
 	then
 		# localhost must be resolved in a special way to point to the host instead of the container itself
+		local ip=""
 
-		if [[ $(ping -c1 docker.for.win.localhost) ]]
-		then
-			echo "Resolving 'localhost' as 'docker.for.win.localhost'";
-			resolvedHost="docker.for.win.localhost"
-		elif [[ $(ping -c1 docker.for.mac.localhost) ]]
-		then
-			echo "Resolving 'localhost' as 'docker.for.mac.localhost'";
-                        resolvedHost="docker.for.mac.localhost"
+		ip=$(sh -c "timeout 1s ping -c1 $DOCKER_MAC_HOST" 2>&1)
+
+		if [ "$?" -eq 0 ]; then
+			ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)    
 		else
-			echo "Resolving 'localhost' as itself";
-			resolvedHost=$host
+			ip=$(sh -c "timeout 1s ping -c1 $DOCKER_WINDOWS_HOST" 2>&1)
+
+			if [ "$?" -eq 0 ]; then
+				ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
+			else
+				ip=$(ip r | grep ^default | cut -d" " -f3)
+			fi
 		fi
+
+		resolvedHost=$ip
+		echo "Resolved 'localhost' as '$resolvedHost'"
 	else
 		resolvedHost=$host
 	fi;
