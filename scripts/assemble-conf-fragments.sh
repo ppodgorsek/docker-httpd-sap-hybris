@@ -30,6 +30,7 @@ do
 			echo "Resolving 'localhost' as 'docker.for.win.localhost'";
 			resolvedHost="docker.for.win.localhost"
 		elif [[ $(ping -c1 docker.for.mac.localhost) ]]
+		then
 			echo "Resolving 'localhost' as 'docker.for.mac.localhost'";
                         resolvedHost="docker.for.mac.localhost"
 		else
