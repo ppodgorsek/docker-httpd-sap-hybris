@@ -27,7 +27,6 @@ do
 	if [ $host == 'localhost' ]
 	then
 		# localhost must be resolved in a special way to point to the host instead of the container itself
-		local ip=""
 
 		ip=$(sh -c "timeout 1s ping -c1 $DOCKER_MAC_HOST" 2>&1)
 
