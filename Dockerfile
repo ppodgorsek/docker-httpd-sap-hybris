@@ -13,7 +13,9 @@ ENV SSL_KEY_FILE localhost.key
 ENV SSL_CRT_FILE localhost.crt
 
 RUN dnf upgrade -y\
-	&& dnf install -y mod_ssl-1:2.4.29-1.fc27\
+	&& dnf install -y\
+		mod_ssl-1:2.4.29-*\
+		iputils\
 	&& dnf clean all
 
 RUN mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/001-ssl.conf\
