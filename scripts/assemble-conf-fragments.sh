@@ -3,9 +3,9 @@
 DOCKER_MAC_HOST="docker.for.mac.localhost"
 DOCKER_WINDOWS_HOST="docker.for.win.localhost"
 
-echo "Hybris backend hosts: ${BACKEND_HOSTS}"
-echo "Hybris backend port: ${BACKEND_PORT}"
-echo "Hybris backend protocol: ${BACKEND_PROTOCOL}"
+echo "Backend hosts: ${BACKEND_HOSTS}"
+echo "Backend port: ${BACKEND_PORT}"
+echo "Backend protocol: ${BACKEND_PROTOCOL}"
 
 CONF_FRAGMENTS_FOLDER=/httpd-conf-fragments
 HTTPD_CUSTOM_CONF_FOLDER=/etc/httpd/conf.d
