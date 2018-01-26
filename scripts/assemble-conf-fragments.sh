@@ -30,20 +30,26 @@ do
 
 		ip=$(sh -c "timeout 1s ping -c1 $DOCKER_MAC_HOST" 2>&1)
 
+		echo "Ping result for '$DOCKER_MAC_HOST': $ip"
+
 		if [ "$?" -eq 0 ]; then
-			ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)    
+			ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
+			echo "IP resolved for $DOCKER_MAC_HOST: $ip"    
 		else
 			ip=$(sh -c "timeout 1s ping -c1 $DOCKER_WINDOWS_HOST" 2>&1)
 
+			echo "Ping result for '$DOCKER_WINDOWS_HOST': $ip"
+
 			if [ "$?" -eq 0 ]; then
 				ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
+				echo "IP resolved for $DOCKER_WINDOWS_HOST: $ip"
 			else
 				ip=$(ip r | grep ^default | cut -d" " -f3)
+				echo "IP resolved for 'localhost': $ip"
 			fi
 		fi
 
 		resolvedHost=$ip
-		echo "Resolved 'localhost' as '$resolvedHost'"
 	else
 		resolvedHost=$host
 	fi;
