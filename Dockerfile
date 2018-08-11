@@ -33,6 +33,6 @@ RUN mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/001-ssl.conf \
 COPY ssl/* /opt/ssl/
 COPY conf/* /httpd-conf-fragments/
 
-COPY scripts/define-configuration-and-start /usr/local/bin/
+COPY scripts/define-configuration-and-start.sh /usr/local/bin/
 
 CMD ["define-configuration-and-start.sh"]
