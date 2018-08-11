@@ -25,13 +25,14 @@ RUN dnf upgrade -y \
 		iputils \
 	&& dnf clean all
 
-RUN mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/001-ssl.conf \
-	&& rm -f /etc/httpd/conf.d/README \
-		/etc/httpd/conf.d/autoindex.conf \
-		/etc/httpd/conf.d/welcome.conf
-
 COPY ssl/* /opt/ssl/
-COPY conf/* /httpd-conf-fragments/
+COPY conf/fallback/* /etc/httpd/fallback.conf.d/
+COPY conf/fragments/* /httpd-conf-fragments/
+
+RUN sed -i -e 's/IncludeOptional conf\.d\/\*\.conf/IncludeOptional default.conf.d\/*.conf\nIncludeOptional conf.d\/*.conf\nIncludeOptional fallback.conf.d\/*.conf/g' /etc/httpd/conf/httpd.conf \
+	&& mkdir /etc/httpd/default.conf.d \
+	&& mv /etc/httpd/conf.d/ssl.conf /etc/httpd/default.conf.d/001-ssl.conf \
+	&& rm -f /etc/httpd/conf.d/*
 
 COPY scripts/define-configuration-and-start.sh /usr/local/bin/
 
