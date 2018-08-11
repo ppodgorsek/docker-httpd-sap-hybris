@@ -3,25 +3,28 @@
 DOCKER_MAC_HOST="docker.for.mac.localhost"
 DOCKER_WINDOWS_HOST="docker.for.win.localhost"
 
+CONF_FRAGMENTS_FOLDER=/httpd-conf-fragments
+HTTPD_DEFAULT_CONF_FOLDER=/etc/httpd/default.conf.d
+HTTPD_CUSTOM_CONF_FOLDER=/etc/httpd/default.conf.d
+HTTPD_FALLBACK_CONF_FOLDER=/etc/httpd/default.conf.d
+
 echo "Defining the server name as: ${SERVER_NAME}"
-echo "ServerName ${SERVER_NAME}" > /etc/httpd/conf.d/000-server-details.conf
+echo "ServerName ${SERVER_NAME}" > ${HTTPD_DEFAULT_CONF_FOLDER}/000-server-details.conf
 
 echo "Backend hosts: ${BACKEND_HOSTS}"
 echo "Backend port: ${BACKEND_PORT}"
 echo "Backend protocol: ${BACKEND_PROTOCOL}"
 
-CONF_FRAGMENTS_FOLDER=/httpd-conf-fragments
-HTTPD_CUSTOM_CONF_FOLDER=/etc/httpd/conf.d
-
-sed -i -e "s/SSLCertificateFile .*/SSLCertificateFile \/opt\/ssl\/${SSL_CRT_FILE}/g" ${HTTPD_CUSTOM_CONF_FOLDER}/001-ssl.conf
-sed -i -e "s/SSLCertificateKeyFile .*/SSLCertificateKeyFile \/opt\/ssl\/${SSL_KEY_FILE}/g" ${HTTPD_CUSTOM_CONF_FOLDER}/001-ssl.conf
+sed -i -e "s/SSLCertificateFile .*/SSLCertificateFile \/opt\/ssl\/${SSL_CRT_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/001-ssl.conf
+sed -i -e "s/SSLCertificateKeyFile .*/SSLCertificateKeyFile \/opt\/ssl\/${SSL_KEY_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/001-ssl.conf
 
 # Split the list of hosts
 hostsArray=`echo "${BACKEND_HOSTS}" | sed "s/,/ /g"`
 
 counter=0
 
-cat $CONF_FRAGMENTS_FOLDER/010-balancer-begin.conf > $HTTPD_CUSTOM_CONF_FOLDER/010-balancer.conf
+cat $CONF_FRAGMENTS_FOLDER/010-balancer-begin.conf >> $HTTPD_FALLBACK_CONF_FOLDER/001-http-backend.conf
+cat $CONF_FRAGMENTS_FOLDER/010-balancer-begin.conf >> $HTTPD_FALLBACK_CONF_FOLDER/002-https-backend.conf
 
 for host in $hostsArray
 do
@@ -57,10 +60,12 @@ do
 		resolvedHost=$host
 	fi;
 
-	echo "    BalancerMember \"${BACKEND_PROTOCOL}://${resolvedHost}:${BACKEND_PORT}\" route=$counter" >> $HTTPD_CUSTOM_CONF_FOLDER/010-balancer.conf
+	echo "    BalancerMember \"${BACKEND_PROTOCOL}://${resolvedHost}:${BACKEND_PORT}\" route=$counter" >> $HTTPD_FALLBACK_CONF_FOLDER/001-http-backend.conf
+	echo "    BalancerMember \"${BACKEND_PROTOCOL}://${resolvedHost}:${BACKEND_PORT}\" route=$counter" >> $HTTPD_FALLBACK_CONF_FOLDER/002-https-backend.conf
 done
 
-cat $CONF_FRAGMENTS_FOLDER/010-balancer-end.conf >> $HTTPD_CUSTOM_CONF_FOLDER/010-balancer.conf
+cat $CONF_FRAGMENTS_FOLDER/010-balancer-end.conf >> $HTTPD_FALLBACK_CONF_FOLDER/001-http-backend.conf
+cat $CONF_FRAGMENTS_FOLDER/010-balancer-end.conf >> $HTTPD_FALLBACK_CONF_FOLDER/002-https-backend.conf
 
 # Continue with the usual startup
 httpd -DFOREGROUND

@@ -55,9 +55,9 @@ Remember, those files will be imported in alphabetical order.
 By default, all requests received on ports 80 and 443 will be forwarded to the AJP port (8009) on `localhost` (the Docker host).
 
 You can change this behaviour by setting the following environment variables when running the image:
-  * BACKEND_HOSTS=localhost
-  * BACKEND_PORT=8009
-  * BACKEND_PROTOCOL=ajp
+  * BACKEND_HOSTS (default: `localhost`, the Docker host)
+  * BACKEND_PORT (default: `8009`)
+  * BACKEND_PROTOCOL (default: `ajp`)
 
 A list of backend hosts can be provided as a list separate by commas, for example:
 
@@ -88,4 +88,3 @@ The certificate files is relative to the folder which has been mounted.
 ## Please contribute!
 
 Have you found an issue? Do you have an idea for an improvement? Feel free to contribute by submitting it [on the GitHub project](https://github.com/ppodgorsek/docker-httpd-ssl-balancer/issues).
-
