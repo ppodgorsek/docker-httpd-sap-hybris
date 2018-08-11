@@ -35,8 +35,6 @@ The `ServerName` directive can be defined by setting the `SERVER_NAME` environme
         -e SERVER_NAME=myserver.com \
         ppodgorsek/httpd-ssl-balancer:<version>
 
-It will be defined in a specific configuration file which will be created for that purpose when the container starts: `/etc/httpd/conf.d/000-server-details.conf`
-
 By default, it is set to `localhost`.
 
 ### Defining custom configuration
