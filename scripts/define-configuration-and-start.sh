@@ -3,6 +3,9 @@
 DOCKER_MAC_HOST="docker.for.mac.localhost"
 DOCKER_WINDOWS_HOST="docker.for.win.localhost"
 
+echo "Defining the server name as: ${SERVER_NAME}"
+echo "ServerName ${SERVER_NAME}" > /etc/httpd/conf.d/000-server-details.conf
+
 echo "Backend hosts: ${BACKEND_HOSTS}"
 echo "Backend port: ${BACKEND_PORT}"
 echo "Backend protocol: ${BACKEND_PROTOCOL}"
@@ -60,4 +63,4 @@ done
 cat $CONF_FRAGMENTS_FOLDER/010-balancer-end.conf >> $HTTPD_CUSTOM_CONF_FOLDER/010-balancer.conf
 
 # Continue with the usual startup
-/usr/local/bin/define-server-name-and-start.sh
+httpd -DFOREGROUND

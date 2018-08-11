@@ -4,19 +4,51 @@
 
 This project consists of a Docker image containing a load-balancer taking care of SSL termination, based on httpd.
 
+It allows to use a dedicated folder for any custom configuration for httpd.
+
 ## Versioning
 
 The versioning of this image follows the one of Apache httpd:
-* Major and minor versions match the ones of httpd
-* Patch version is specific to this project (allows to update the versions of the other dependencies)
+
+* Major version matches the one of httpd
+* Minor and patch versions are specific to this project (allows to update the versions of the other dependencies)
+
+The current versions used are:
+
+* httpd 2.4
+* mod_ssl 2.4
 
 ## Running the container
 
 This container can be run using the following command:
 
-    docker run -p 80:80\
-        -p 443:443\
+    docker run \
+        -p 80:80 \
+        -p 443:443 \
         ppodgorsek/httpd-ssl-balancer:<version>
+
+### Server name
+
+The `ServerName` directive can be defined by setting the `SERVER_NAME` environment variable, as per the following example:
+
+    docker run \
+        -e SERVER_NAME=myserver.com \
+        ppodgorsek/httpd-ssl-balancer:<version>
+
+It will be defined in a specific configuration file which will be created for that purpose when the container starts: `/etc/httpd/conf.d/000-server-details.conf`
+
+By default, it is set to `localhost`.
+
+### Defining custom configuration
+
+If you would like to use custom configuration files, simply place them in a folder and mount it as a volume:
+
+    docker run \
+        -v <local path to folder containing configuration files>:/etc/httpd/conf.d:Z \
+        ppodgorsek/httpd-ssl-balancer:<version>
+
+All `*.conf` files placed in that folder will be loaded in addition to a minimal httpd configuration.
+Remember, those files will be imported in alphabetical order.
 
 ### Backend servers
 
