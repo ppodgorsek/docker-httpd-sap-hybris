@@ -59,9 +59,9 @@ You can change this behaviour by setting the following environment variables whe
 
 A list of backend hosts can be provided as a list separate by commas, for example:
 
-    docker run -p 80:80\
-        -p 443:443\
-        -e BACKEND_HOSTS=server1.mydomain.com,server2.mydomain.com\
+    docker run -p 80:80 \
+        -p 443:443 \
+        -e BACKEND_HOSTS=server1.mydomain.com,server2.mydomain.com \
         ppodgorsek/httpd-ssl-balancer:<version>
 
 The accepted backend protocols are:
@@ -74,14 +74,27 @@ Be aware that all backend servers must use the same port and protocol.
 
 A default self-signed certificate has been generated for `localhost`. You can use your own certificate by mounting its location as a volume and by defining the corresponding environment variables:
 
-    docker run -p 80:80\
-        -p 443:443\
-        -v <local path to the certificate's folder>:/opt/ssl:Z\
-        -e SSL_KEY_FILE=mydomain.key\
-        -e SSL_CRT_FILE=mydomain.crt\
+    docker run -p 80:80 \
+        -p 443:443 \
+        -v <local path to the certificate's folder>:/opt/ssl:Z \
+        -e SSL_KEY_FILE=mydomain.key \
+        -e SSL_CRT_FILE=mydomain.crt \
         ppodgorsek/httpd-ssl-balancer:<version>
 
 The certificate files is relative to the folder which has been mounted.
+
+### Forbidden http requests
+
+This image can redirect all http requests to their https counterpart, as a matter of security. For example, `http://my.domain/example.html` will be redirected to `https://my.domain/example.html`.
+
+This can be controlled by the `SERVER_FORCE_HTTPS` environment variable:
+
+    docker run -p 80:80 \
+        -p 443:443 \
+        -e SERVER_FORCE_HTTPS=false \
+        ppodgorsek/httpd-ssl-balancer:<version>
+
+The value is set to `true` by default.
 
 ## Please contribute!
 

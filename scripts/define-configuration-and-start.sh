@@ -67,5 +67,12 @@ done
 cat $CONF_FRAGMENTS_FOLDER/010-balancer-end.conf >> $HTTPD_FALLBACK_CONF_FOLDER/001-http-backend.conf
 cat $CONF_FRAGMENTS_FOLDER/010-balancer-end.conf >> $HTTPD_FALLBACK_CONF_FOLDER/002-https-backend.conf
 
+if [ "${SERVER_FORCE_HTTPS}" == "true" ]
+then
+	rm -f $HTTPD_FALLBACK_CONF_FOLDER/001-http-backend.conf
+else
+	rm -f $HTTPD_FALLBACK_CONF_FOLDER/001-http-redirection.conf
+fi
+
 # Continue with the usual startup
 httpd -DFOREGROUND
