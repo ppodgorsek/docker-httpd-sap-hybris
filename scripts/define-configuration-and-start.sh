@@ -14,6 +14,15 @@ echo "ServerName ${SERVER_NAME}" > ${HTTPD_DEFAULT_CONF_FOLDER}/000-server-detai
 echo "Request timeout: ${SERVER_REQUEST_TIMEOUT}"
 echo "Timeout ${SERVER_REQUEST_TIMEOUT}" >> ${HTTPD_DEFAULT_CONF_FOLDER}/001-request-timeout.conf
 
+echo "Server signature: ${SERVER_SIGNATURE}"
+echo "ServerSignature ${SERVER_SIGNATURE}" >> ${HTTPD_DEFAULT_CONF_FOLDER}/002-server-signature.conf
+
+if [ "${SERVER_ADMIN_EMAIL}" != "" ]
+then
+	echo "Server admin email: ${SERVER_ADMIN_EMAIL}"
+	echo "ServerAdmin ${SERVER_ADMIN_EMAIL}" >> ${HTTPD_DEFAULT_CONF_FOLDER}/002-server-signature.conf
+fi
+
 echo "Backend hosts: ${BACKEND_HOSTS}"
 echo "Backend port: ${BACKEND_PORT}"
 echo "Backend protocol: ${BACKEND_PROTOCOL}"
