@@ -131,6 +131,15 @@ The server signature is off by default but can be enabled in the `run` command:
         -e SERVER_ADMIN_EMAIL=admin@mydomain.com \
         ppodgorsek/httpd-ssl-balancer:<version>
 
+## Known issues
+
+### Using localhost as a backend server
+
+Issues can occur when using `localhost` as a backend server on Windows and Mac, depending on the version of Docker you are using.
+This is due to a bad resolution of that host name, pointing to the container itself instead of the host.
+
+To avoid such issues, replace `localhost` by the IP address of your host.
+
 ## Please contribute!
 
 Have you found an issue? Do you have an idea for an improvement? Feel free to contribute by submitting it [on the GitHub project](https://github.com/ppodgorsek/docker-httpd-ssl-balancer/issues).
