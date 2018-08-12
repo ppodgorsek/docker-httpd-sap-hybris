@@ -96,6 +96,17 @@ This can be controlled by the `SERVER_FORCE_HTTPS` environment variable:
 
 The value is set to `true` by default.
 
+### Request timeout
+
+The request timeout can be set by using the `SERVER_REQUEST_TIMEOUT` environment variable:
+
+    docker run -p 80:80 \
+        -p 443:443 \
+        -e SERVER_REQUEST_TIMEOUT=300 \
+        ppodgorsek/httpd-ssl-balancer:<version>
+
+The value is set to 120 by default.
+
 ## Please contribute!
 
 Have you found an issue? Do you have an idea for an improvement? Feel free to contribute by submitting it [on the GitHub project](https://github.com/ppodgorsek/docker-httpd-ssl-balancer/issues).
