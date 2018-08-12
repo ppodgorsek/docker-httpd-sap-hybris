@@ -11,12 +11,15 @@ HTTPD_FALLBACK_CONF_FOLDER=/etc/httpd/default.conf.d
 echo "Defining the server name as: ${SERVER_NAME}"
 echo "ServerName ${SERVER_NAME}" > ${HTTPD_DEFAULT_CONF_FOLDER}/000-server-details.conf
 
+echo "Request timeout: ${SERVER_REQUEST_TIMEOUT}"
+echo "Timeout ${SERVER_REQUEST_TIMEOUT}" >> ${HTTPD_DEFAULT_CONF_FOLDER}/001-request-timeout.conf
+
 echo "Backend hosts: ${BACKEND_HOSTS}"
 echo "Backend port: ${BACKEND_PORT}"
 echo "Backend protocol: ${BACKEND_PROTOCOL}"
 
-sed -i -e "s/SSLCertificateFile .*/SSLCertificateFile \/opt\/ssl\/${SSL_CRT_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/001-ssl.conf
-sed -i -e "s/SSLCertificateKeyFile .*/SSLCertificateKeyFile \/opt\/ssl\/${SSL_KEY_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/001-ssl.conf
+sed -i -e "s/SSLCertificateFile .*/SSLCertificateFile \/opt\/ssl\/${SSL_CRT_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/010-ssl.conf
+sed -i -e "s/SSLCertificateKeyFile .*/SSLCertificateKeyFile \/opt\/ssl\/${SSL_KEY_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/010-ssl.conf
 
 # Split the list of hosts
 hostsArray=`echo "${BACKEND_HOSTS}" | sed "s/,/ /g"`

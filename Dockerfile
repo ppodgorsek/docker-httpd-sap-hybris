@@ -12,6 +12,7 @@ ENV BACKEND_PROTOCOL ajp
 
 ENV SERVER_NAME localhost
 ENV SERVER_FORCE_HTTPS true
+ENV SERVER_REQUEST_TIMEOUT 120
 
 ENV SSL_KEY_FILE localhost.key
 ENV SSL_CRT_FILE localhost.crt
@@ -27,12 +28,12 @@ RUN dnf upgrade -y \
 	&& dnf clean all
 
 COPY ssl/* /opt/ssl/
+COPY conf/default/* /etc/httpd/default.conf.d/
 COPY conf/fallback/* /etc/httpd/fallback.conf.d/
 COPY conf/fragments/* /httpd-conf-fragments/
 
 RUN sed -i -e 's/IncludeOptional conf\.d\/\*\.conf/IncludeOptional default.conf.d\/*.conf\nIncludeOptional conf.d\/*.conf\nIncludeOptional fallback.conf.d\/*.conf/g' /etc/httpd/conf/httpd.conf \
-	&& mkdir /etc/httpd/default.conf.d \
-	&& mv /etc/httpd/conf.d/ssl.conf /etc/httpd/default.conf.d/001-ssl.conf \
+	&& mv /etc/httpd/conf.d/ssl.conf /etc/httpd/default.conf.d/010-ssl.conf \
 	&& rm -f /etc/httpd/conf.d/*
 
 COPY scripts/define-configuration-and-start.sh /usr/local/bin/
