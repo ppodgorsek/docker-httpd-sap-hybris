@@ -1,2 +1,4 @@
-.travis.yml
-
+/.gitignore
+/.travis.yml
+/LICENSE
+/README.md
