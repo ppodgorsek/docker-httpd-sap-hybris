@@ -73,15 +73,19 @@ Be aware that all backend servers must use the same port and protocol.
 ### SSL
 
 A default self-signed certificate has been generated for `localhost`. You can use your own certificate by mounting its location as a volume and by defining the corresponding environment variables:
+  * `SSL_KEY_FILE`: the SSL private key file
+  * `SSL_CERTIFICATE_FILE`: the SSL certificate file (either self-generated or provided by your certificate authority)
+  * `SSL_CA_CERTIFICATE_FILE`: the SSL CA certificate provided by your certificate authority
+
+The certificate files are relative to the folder which has been mounted. The run command would therefore resemble:
 
     docker run -p 80:80 \
         -p 443:443 \
         -v <local path to the certificate's folder>:/opt/ssl:Z \
         -e SSL_KEY_FILE=mydomain.key \
-        -e SSL_CRT_FILE=mydomain.crt \
+        -e SSL_CERTIFICATE_FILE=mydomain.cer \
+        -e SSL_CA_CERTIFICATE_FILE=mytrustprovider.cer \
         ppodgorsek/httpd-ssl-balancer:<version>
-
-The certificate files is relative to the folder which has been mounted.
 
 ### Forbidden http requests
 
