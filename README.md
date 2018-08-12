@@ -59,7 +59,8 @@ You can change this behaviour by setting the following environment variables whe
 
 A list of backend hosts can be provided as a list separate by commas, for example:
 
-    docker run -p 80:80 \
+    docker run \
+        -p 80:80 \
         -p 443:443 \
         -e BACKEND_HOSTS=server1.mydomain.com,server2.mydomain.com \
         ppodgorsek/httpd-ssl-balancer:<version>
@@ -79,7 +80,8 @@ A default self-signed certificate has been generated for `localhost`. You can us
 
 The certificate files are relative to the folder which has been mounted. The run command would therefore resemble:
 
-    docker run -p 80:80 \
+    docker run \
+        -p 80:80 \
         -p 443:443 \
         -v <local path to the certificate's folder>:/opt/ssl:Z \
         -e SSL_KEY_FILE=mydomain.key \
@@ -93,7 +95,8 @@ This image can redirect all http requests to their https counterpart, as a matte
 
 This can be controlled by the `SERVER_FORCE_HTTPS` environment variable:
 
-    docker run -p 80:80 \
+    docker run \
+        -p 80:80 \
         -p 443:443 \
         -e SERVER_FORCE_HTTPS=false \
         ppodgorsek/httpd-ssl-balancer:<version>
@@ -104,12 +107,29 @@ The value is set to `true` by default.
 
 The request timeout can be set by using the `SERVER_REQUEST_TIMEOUT` environment variable:
 
-    docker run -p 80:80 \
+    docker run \
+        -p 80:80 \
         -p 443:443 \
         -e SERVER_REQUEST_TIMEOUT=300 \
         ppodgorsek/httpd-ssl-balancer:<version>
 
 The value is set to 120 by default.
+
+### Server signature
+
+It is possible to influence the signature of server-generated pages (internal error documents, FTP directory listings, etc) by setting the `SERVER_SIGNATURE` environment variable. It can have a limited number of values:
+  * `On`: the default signature is displayed
+  * `Off`: no signature is displayed
+  * `EMail`: will include a `mailto:` link to the server admin, set using the `SERVER_ADMIN_EMAIL` environment variable (empty by default)
+
+The server signature is off by default but can be enabled in the `run` command:
+
+    docker run \
+        -p 80:80 \
+        -p 443:443 \
+        -e SERVER_SIGNATURE=EMail \
+        -e SERVER_ADMIN_EMAIL=admin@mydomain.com \
+        ppodgorsek/httpd-ssl-balancer:<version>
 
 ## Please contribute!
 
