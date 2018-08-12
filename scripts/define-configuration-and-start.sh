@@ -5,8 +5,8 @@ DOCKER_WINDOWS_HOST="docker.for.win.localhost"
 
 CONF_FRAGMENTS_FOLDER=/httpd-conf-fragments
 HTTPD_DEFAULT_CONF_FOLDER=/etc/httpd/default.conf.d
-HTTPD_CUSTOM_CONF_FOLDER=/etc/httpd/default.conf.d
-HTTPD_FALLBACK_CONF_FOLDER=/etc/httpd/default.conf.d
+HTTPD_CUSTOM_CONF_FOLDER=/etc/httpd/conf.d
+HTTPD_FALLBACK_CONF_FOLDER=/etc/httpd/fallback.conf.d
 
 echo "Defining the server name as: ${SERVER_NAME}"
 echo "ServerName ${SERVER_NAME}" > ${HTTPD_DEFAULT_CONF_FOLDER}/000-server-details.conf
@@ -18,8 +18,13 @@ echo "Backend hosts: ${BACKEND_HOSTS}"
 echo "Backend port: ${BACKEND_PORT}"
 echo "Backend protocol: ${BACKEND_PROTOCOL}"
 
-sed -i -e "s/SSLCertificateFile .*/SSLCertificateFile \/opt\/ssl\/${SSL_CRT_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/010-ssl.conf
+sed -i -e "s/SSLCertificateFile .*/SSLCertificateFile \/opt\/ssl\/${SSL_CERTIFICATE_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/010-ssl.conf
 sed -i -e "s/SSLCertificateKeyFile .*/SSLCertificateKeyFile \/opt\/ssl\/${SSL_KEY_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/010-ssl.conf
+
+if [ "${SSL_CA_CERTIFICATE_FILE}" != "" ]
+then
+	sed -i -e "s/#SSLCACertificateFile .*/SSLCACertificateFile \/opt\/ssl\/${SSL_CA_CERTIFICATE_FILE}/g" ${HTTPD_DEFAULT_CONF_FOLDER}/010-ssl.conf
+fi
 
 # Split the list of hosts
 hostsArray=`echo "${BACKEND_HOSTS}" | sed "s/,/ /g"`
@@ -39,23 +44,43 @@ do
 
 		ip=$(sh -c "timeout 1s ping -c1 $DOCKER_MAC_HOST" 2>&1)
 
-		echo "Ping result for '$DOCKER_MAC_HOST': $ip"
+#		echo "Ping result for '$DOCKER_MAC_HOST': $ip"
 
-		if [ "$?" -eq 0 ]; then
+		if [ "$?" -eq 0 ]
+		then
 			ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
-			echo "IP resolved for $DOCKER_MAC_HOST: $ip"    
 		else
+			ip=""
+		fi
+
+		if [ "$ip" == "" ]
+		then
 			ip=$(sh -c "timeout 1s ping -c1 $DOCKER_WINDOWS_HOST" 2>&1)
 
-			echo "Ping result for '$DOCKER_WINDOWS_HOST': $ip"
+#			echo "Ping result for '$DOCKER_WINDOWS_HOST': $ip"
 
-			if [ "$?" -eq 0 ]; then
+			if [ "$?" -eq 0 ]
+			then
 				ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
-				echo "IP resolved for $DOCKER_WINDOWS_HOST: $ip"
 			else
-				ip=$(ip r | grep ^default | cut -d" " -f3)
-				echo "IP resolved for 'localhost': $ip"
+				ip=""
 			fi
+		else
+			echo "IP resolved for $DOCKER_MAC_HOST: $ip"
+		fi
+
+		if [ "$ip" == "" ]
+		then
+			ip=$(ip r | grep ^default | cut -d" " -f3)
+		else
+			echo "IP resolved for $DOCKER_WINDOWS_HOST: $ip"
+		fi
+
+		if [ "$ip" == "" ]
+		then
+			resolvedHost=$host
+		else
+			echo "IP resolved for 'localhost': $ip"
 		fi
 
 		resolvedHost=$ip

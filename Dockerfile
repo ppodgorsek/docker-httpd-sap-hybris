@@ -15,7 +15,8 @@ ENV SERVER_FORCE_HTTPS true
 ENV SERVER_REQUEST_TIMEOUT 120
 
 ENV SSL_KEY_FILE localhost.key
-ENV SSL_CRT_FILE localhost.crt
+ENV SSL_CERTIFICATE_FILE localhost.crt
+ENV SSL_CA_CERTIFICATE_FILE ""
 
 ENV HTTPD_VERSION 2.4.*
 ENV MOD_SSL_VERSION 1:2.4.*
@@ -24,6 +25,7 @@ RUN dnf upgrade -y \
 	&& dnf install -y \
 		httpd-${HTTPD_VERSION} \
 		mod_ssl-${MOD_SSL_VERSION} \
+		iproute \
 		iputils \
 	&& dnf clean all
 
