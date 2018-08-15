@@ -40,6 +40,9 @@ hostsArray=`echo "${BACKEND_HOSTS}" | sed "s/,/ /g"`
 
 counter=0
 
+echo "<VirtualHost *:80>" > $HTTPD_FALLBACK_CONF_FOLDER/001-http-backend.conf
+echo "<VirtualHost *:443>" > $HTTPD_FALLBACK_CONF_FOLDER/002-https-backend.conf
+
 cat $CONF_FRAGMENTS_FOLDER/010-balancer-begin.conf >> $HTTPD_FALLBACK_CONF_FOLDER/001-http-backend.conf
 cat $CONF_FRAGMENTS_FOLDER/010-balancer-begin.conf >> $HTTPD_FALLBACK_CONF_FOLDER/002-https-backend.conf
 
