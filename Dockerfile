@@ -33,13 +33,12 @@ RUN dnf upgrade -y \
 
 COPY ssl/* /opt/ssl/
 COPY conf/default/* /etc/httpd/default.conf.d/
-COPY conf/fallback/* /etc/httpd/fallback.conf.d/
 COPY conf/fragments/* /httpd-conf-fragments/
 
-RUN sed -i -e 's/IncludeOptional conf\.d\/\*\.conf/IncludeOptional default.conf.d\/*.conf\nIncludeOptional conf.d\/*.conf\nIncludeOptional fallback.conf.d\/*.conf/g' /etc/httpd/conf/httpd.conf \
-	&& mv /etc/httpd/conf.d/ssl.conf /etc/httpd/default.conf.d/010-ssl.conf \
-	&& rm -f /etc/httpd/conf.d/*
+RUN sed -i -e 's/IncludeOptional conf\.d\/\*\.conf/IncludeOptional default.conf.d\/*.conf\nIncludeOptional custom.conf.d\/*.conf/g' /etc/httpd/conf/httpd.conf \
+	&& rm -f /etc/httpd/conf.d/* \
+	&& mkdir /etc/httpd/custom.conf.d
 
-COPY scripts/define-configuration-and-start.sh /usr/local/bin/
+COPY scripts/* /opt/httpd/bin/
 
-CMD ["define-configuration-and-start.sh"]
+CMD ["/opt/httpd/bin/define-configuration-and-start.sh"]
