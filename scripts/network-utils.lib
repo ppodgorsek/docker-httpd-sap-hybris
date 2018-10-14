@@ -1,0 +1,75 @@
+# network-utils.lib
+# Note no #!/bin/sh as this should not spawn an extra shell.
+# It's not the end of the world to have one, but clearer not to.
+
+RESOLVED_LOCALHOST="localhost"
+
+determineLocalhost() {
+	# localhost must be resolved in a special way to point to the host instead of the container itself
+
+	ip=$(sh -c "timeout 1s ping -c1 $DOCKER_MAC_HOST" 2>&1)
+
+#		echo "Ping result for '$DOCKER_MAC_HOST': $ip"
+
+	if [ "$?" -eq 0 ]
+	then
+		ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
+	else
+		ip=""
+	fi
+
+	if [ "$ip" == "" ]
+	then
+		ip=$(sh -c "timeout 1s ping -c1 $DOCKER_WINDOWS_HOST" 2>&1)
+
+#			echo "Ping result for '$DOCKER_WINDOWS_HOST': $ip"
+
+		if [ "$?" -eq 0 ]
+		then
+			ip=$(echo "$ip" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n1)
+		else
+			ip=""
+		fi
+	else
+#		echo "IP resolved for $DOCKER_MAC_HOST: $ip"
+	fi
+
+	if [ "$ip" == "" ]
+	then
+		ip=$(ip r | grep ^default | cut -d" " -f3)
+	else
+#		echo "IP resolved for $DOCKER_WINDOWS_HOST: $ip"
+	fi
+
+	if [ "$ip" != "" ]
+	then
+		RESOLVED_LOCALHOST=$ip
+	fi
+
+	echo "Host 'localhost' resolved as: $RESOLVED_LOCALHOST"
+}
+
+generateDefaultVirtualHosts() {
+	# Split the list of hosts
+	hostsArray=`echo "${BACKEND_HOSTS}" | sed "s/,/ /g"`
+
+	counter=0
+
+	echo "<VirtualHost _default_:80>" > $HTTPD_DEFAULT_CONF_FOLDER/010-http-backend.conf
+	echo "<VirtualHost _default_:443>" > $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
+	echo '${DEFAULT_SSL_CONFIGURATION}' > $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
+
+	cat $CONF_FRAGMENTS_FOLDER/001-balancer-begin.conf >> $HTTPD_DEFAULT_CONF_FOLDER/010-http-backend.conf
+	cat $CONF_FRAGMENTS_FOLDER/001-balancer-begin.conf >> $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
+
+	for host in $hostsArray
+	do
+		counter=$((counter+1))
+
+		echo "    BalancerMember \"${BACKEND_PROTOCOL}://${host}:${BACKEND_PORT}\" route=$counter" >> $HTTPD_DEFAULT_CONF_FOLDER/010-http-backend.conf
+		echo "    BalancerMember \"${BACKEND_PROTOCOL}://${host}:${BACKEND_PORT}\" route=$counter" >> $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
+	done
+
+	cat $CONF_FRAGMENTS_FOLDER/001-balancer-end.conf >> $HTTPD_DEFAULT_CONF_FOLDER/010-http-backend.conf
+	cat $CONF_FRAGMENTS_FOLDER/001-balancer-end.conf >> $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
+}
