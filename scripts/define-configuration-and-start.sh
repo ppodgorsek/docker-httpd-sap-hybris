@@ -29,7 +29,12 @@ echo "Backend hosts: ${BACKEND_HOSTS}"
 echo "Backend port: ${BACKEND_PORT}"
 echo "Backend protocol: ${BACKEND_PROTOCOL}"
 
-cp -R ${HTTPD_CONF_FOLDER}/* ${HTTPD_CUSTOM_CONF_FOLDER}/
+if [ -e ${HTTPD_CONF_FOLDER} ]
+then
+	cp -R ${HTTPD_CONF_FOLDER}/* ${HTTPD_CUSTOM_CONF_FOLDER}/
+else
+	touch ${HTTPD_CUSTOM_CONF_FOLDER}/placeholder.conf
+fi
 
 sed -i -e "s/SSLCertificateFile .*/SSLCertificateFile \/opt\/ssl\/${SSL_CERTIFICATE_FILE}/g" ${CONF_FRAGMENTS_FOLDER}/002-default-ssl.conf
 sed -i -e "s/SSLCertificateKeyFile .*/SSLCertificateKeyFile \/opt\/ssl\/${SSL_KEY_FILE}/g" ${CONF_FRAGMENTS_FOLDER}/002-default-ssl.conf
@@ -44,21 +49,21 @@ generateDefaultVirtualHosts
 
 case ${SERVER_FORCE_HTTPS} in
 	"true" )
+		echo "All requests should be secure, http will be redirected to https"
 		rm -f $HTTPD_DEFAULT_CONF_FOLDER/001-http-backend.conf
-		break;;
+		;;
 	"false" )
+		echo "Requests don't need to be secure"
 		rm -f $HTTPD_DEFAULT_CONF_FOLDER/001-http-redirection.conf
-		break;;
+		;;
 	* )
 		echo "The SERVER_FORCE_HTTPS environment variable can only be true or false"
-		exit;;
+		exit
+		;;
 esac
 
-# Replace the default SSL configuration wherever required
-defaultSslConfiguration=`cat ${CONF_FRAGMENTS_FOLDER}/002-default-ssl.conf`
-for i in `ls ${HTTPD_DEFAULT_CONF_FOLDER} ${HTTPD_CUSTOM_CONF_FOLDER}`
+for i in `ls ${HTTPD_DEFAULT_CONF_FOLDER}/* ${HTTPD_CUSTOM_CONF_FOLDER}/* ${CONF_FRAGMENTS_FOLDER}/*`
 do
-	sed -i -e "s/\$[{]DEFAULT_SSL_CONFIGURATION[}]/$defaultSslConfiguration/g" $i
 	sed -i -e "s/\/\/localhost/\/\/${RESOLVED_LOCALHOST}/g" $i
 done
 

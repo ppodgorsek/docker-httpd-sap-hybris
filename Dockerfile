@@ -36,7 +36,7 @@ COPY conf/default/* /etc/httpd/default.conf.d/
 COPY conf/fragments/* /httpd-conf-fragments/
 
 RUN sed -i -e 's/IncludeOptional conf\.d\/\*\.conf/IncludeOptional default.conf.d\/*.conf\nIncludeOptional custom.conf.d\/*.conf/g' /etc/httpd/conf/httpd.conf \
-	&& rm -f /etc/httpd/conf.d/* \
+	&& rm -Rf /etc/httpd/conf.d \
 	&& mkdir /etc/httpd/custom.conf.d
 
 COPY scripts/* /opt/httpd/bin/

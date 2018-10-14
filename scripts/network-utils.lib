@@ -30,14 +30,14 @@ determineLocalhost() {
 		else
 			ip=""
 		fi
-	else
+#	else
 #		echo "IP resolved for $DOCKER_MAC_HOST: $ip"
 	fi
 
 	if [ "$ip" == "" ]
 	then
 		ip=$(ip r | grep ^default | cut -d" " -f3)
-	else
+#	else
 #		echo "IP resolved for $DOCKER_WINDOWS_HOST: $ip"
 	fi
 
@@ -57,7 +57,7 @@ generateDefaultVirtualHosts() {
 
 	echo "<VirtualHost _default_:80>" > $HTTPD_DEFAULT_CONF_FOLDER/010-http-backend.conf
 	echo "<VirtualHost _default_:443>" > $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
-	echo '${DEFAULT_SSL_CONFIGURATION}' > $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
+	echo "Include ${CONF_FRAGMENTS_FOLDER}/002-default-ssl.conf" >> $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
 
 	cat $CONF_FRAGMENTS_FOLDER/001-balancer-begin.conf >> $HTTPD_DEFAULT_CONF_FOLDER/010-http-backend.conf
 	cat $CONF_FRAGMENTS_FOLDER/001-balancer-begin.conf >> $HTTPD_DEFAULT_CONF_FOLDER/011-https-backend.conf
